@@ -1,0 +1,50 @@
+name "Bee Farm"
+
+every tick do
+    -- move power from generators to battery
+    input fe:: from each "Generators" back side
+    output fe:: to "Battery" back side
+    forget
+
+    -- move power from battery to Centrifuges
+    input fe:: from each "Battery" back side
+    output fe:: to each "Centrifuges" back side
+    forget
+end
+
+every 20 ticks do
+    -- Move from beehives to drawer controller
+    input from "Beehives"
+    output to "Drawer Controller"
+    forget
+
+    -- Power Generators with coal
+    input coal from "Drawer Controller"
+    output retain 64 coal to each "Generators"
+    forget
+
+    -- Move modded honeycombs from drawer controller to centrifuges, but leave plain Honeycomb.
+    input *honeycomb* except Honeycomb from "Drawer Controller"
+    output 1 *honeycomb* except Honeycomb to each "Centrifuges"
+    forget
+
+    -- Move all items from centrifuges to drawer controller
+    input from "Centrifuges"
+    output to "Drawer Controller"
+    forget
+
+    -- Move fluids from centrifuges to drawer controller
+    input fluid:: from "Centrifuges"
+    output fluid:: to each "Drawer Controller"
+    forget
+
+    -- Distill honey into honey treat without moving plain Honeycomb.
+    input fluid:*:honey from "Drawer Controller"
+    output fluid:*:honey to each "Bottlers"
+    forget
+
+    -- Collect honey treats from bottlers
+    input honey_treat from "Bottlers"
+    output to "Drawer Controller"
+    forget
+end

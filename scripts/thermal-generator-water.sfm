@@ -1,0 +1,20 @@
+name "Thermal Generator Support"
+
+every tick do
+    -- Move generated FE into the battery bank.
+    input fe:: from each "Thermal Generators"
+    output fe:: to each "Batteries"
+    forget
+end
+
+every 20 ticks do
+    -- Fill the buffer tank from the water source.
+    input fluid::water from each "Water Source"
+    output fluid::water to "Water Tank"
+    forget
+
+    -- Fill each thermal generator from the buffer tank.
+    input fluid::water from "Water Tank"
+    output fluid::water to each "Thermal Generators"
+    forget
+end

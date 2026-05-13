@@ -1,0 +1,25 @@
+name "Furnace Array"
+
+every tick do
+    -- Move FE from the battery bank to the furnace array.
+    input fe:: from each "Battery"
+    output fe:: to each "Furnace"
+    forget
+end
+
+every 20 ticks do
+    input from "Inbound"
+    output retain 2 to each "Furnace" slots 7
+    output retain 2 to each "Furnace" slots 8
+    output retain 2 to each "Furnace" slots 9
+    output retain 2 to each "Furnace" slots 10
+    output retain 2 to each "Furnace" slots 11
+    output retain 2 to each "Furnace" slots 12
+    -- Each furnace input slot accepts one item, so keep a spare queued for each slot.
+    forget
+
+    -- Slots 13-18 are furnace outputs.
+    input from each "Furnace" slots 13-18
+    output to "Outbound"
+    forget
+end
