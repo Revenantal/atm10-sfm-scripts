@@ -1,0 +1,66 @@
+name "Mob Generation"
+
+-- ATM10 uses Hostile Neural Networks for Deep Mob Learning-style automation.
+-- Mob-specific predictions are all hostilenetworks:prediction with model data attached.
+-- AE2 preserves exact prediction variants, so processing patterns can consume
+-- a specific prediction, such as Zombie Prediction, for a configured output.
+--
+-- SFM responsibilities:
+-- - Power all Hostile Neural Networks machines.
+-- - Insert Prediction Matrix into Simulation Chamber slot 1.
+-- - Extract generalized predictions from Simulation Chamber slot 2.
+-- - Extract mob-specific predictions from Simulation Chamber slot 3 into
+--   AE-visible prediction storage.
+-- - Extract fabricated loot from Loot Fabricator slots 1-16.
+--
+-- AE2 responsibilities:
+-- - Store exact mob prediction variants.
+-- - Use processing patterns for each configured Loot Fabricator output, such as
+--   1 Zombie Prediction -> 8 Iron Ingots.
+-- - Use ME Requesters to keep final item stock targets, such as 10000 ingots.
+-- - Use Pattern Providers to insert exact predictions into the specific Loot
+--   Fabricator configured for that pattern's output.
+--
+-- Generic labels:
+-- - "Mob Generation Power" is the FE source.
+-- - "Mob Generation Power Demand" goes on all Simulation Chambers and Loot Fabricators.
+-- - "Prediction Matrix Input" is the source inventory for Prediction Matrix items.
+-- - "Mob Generation Simulation Chamber" goes on all Simulation Chambers.
+-- - "Mob Generation Loot Fabricator" goes on all Loot Fabricators SFM should drain.
+-- - "Prediction Storage Input" is an AE2 import/interface/input inventory for mob predictions.
+-- - "Drawer Controller" receives generalized predictions and fabricated loot.
+
+every tick do
+    input fe:: from each "Mob Generation Power"
+    output fe:: to each "Mob Generation Power Demand"
+    forget
+end
+
+every 20 ticks do
+    -- Prediction Matrix goes into Simulation Chamber slot 1.
+    input hostilenetworks:prediction_matrix from "Prediction Matrix Input"
+    output retain 1 hostilenetworks:prediction_matrix to each "Mob Generation Simulation Chamber" slots 1
+    forget
+
+    -- Generalized prediction outputs are slot 2 and can be mixed safely.
+    input
+        hostilenetworks:overworld_prediction,
+        hostilenetworks:nether_prediction,
+        hostilenetworks:end_prediction,
+        hostilenetworks:twilight_prediction,
+    from each "Mob Generation Simulation Chamber" slots 2
+    output to "Drawer Controller"
+    forget
+
+    -- Mob-specific prediction outputs are slot 3. Send them to AE2-visible
+    -- storage so AE2 can preserve exact prediction variants.
+    input hostilenetworks:prediction from each "Mob Generation Simulation Chamber" slots 3
+    output to "Prediction Storage Input"
+    forget
+
+    -- Loot Fabricator slot 0 is filled by AE2 Pattern Providers.
+    -- Loot Fabricator slots 1-16 are fabricated loot outputs.
+    input from each "Mob Generation Loot Fabricator" slots 1-16
+    output to "Drawer Controller"
+    forget
+end

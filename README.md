@@ -16,6 +16,18 @@ labels in the world.
   and review checks.
 - `AGENTS.md` records repository-specific contributor instructions.
 
+## Reference Sources
+
+- Super Factory Manager upstream:
+  https://github.com/TeamDman/SuperFactoryManager
+- ATM10 pack data and customizations:
+  https://github.com/AllTheMods/ATM-10
+
+Use the ATM10 repository when checking pack-specific item IDs, KubeJS changes,
+recipes, Hostile Neural Networks data models, and available prediction outputs.
+These upstream repositories are reference-only; do not vendor their source into
+this repo.
+
 ## Getting Started
 
 1. Read `SFM_REFERENCE.md` for the supported syntax and local style rules.
@@ -41,5 +53,5 @@ quoted Title Case labels, and `every 20 ticks do` for normal item or fluid
 movement. Energy movement should usually run in its own focused `every tick do`
 trigger.
 
-Upstream Super Factory Manager is reference-only for this repo. Do not vendor
-the mod source here.
+Upstream Super Factory Manager and ATM10 pack sources are reference-only for
+this repo. Do not vendor their source here.

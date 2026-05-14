@@ -25,7 +25,7 @@ every 20 ticks do
 
     -- Move modded honeycombs from drawer controller to centrifuges, but leave plain Honeycomb.
     input *honeycomb* except Honeycomb from "Drawer Controller"
-    output 1 *honeycomb* except Honeycomb to each "Centrifuges"
+    output 64 *honeycomb* except Honeycomb to each "Centrifuges"
     forget
 
     -- Move all items from centrifuges to drawer controller

@@ -9,6 +9,17 @@ The upstream README describes SFM as a Minecraft mod with a domain-specific lang
 items, fluids, and other resource types. The latest upstream release seen during this review was
 `v4.32.0`, released March 10, 2026.
 
+## Reference Sources
+
+- Super Factory Manager upstream: https://github.com/TeamDman/SuperFactoryManager
+- ATM10 pack repository: https://github.com/AllTheMods/ATM-10
+
+Use the ATM10 repository as the pack-specific source of truth for KubeJS overrides, recipes,
+datapacks, mod customizations, and Hostile Neural Networks data models. For mob generation scripts,
+check both the Hostile Neural Networks mod data and ATM10's `kubejs/data/hostilenetworks/data_models`
+path before listing available prediction models or assuming item IDs. Do not vendor upstream SFM or
+ATM10 pack source into this repo.
+
 ## Core Model
 
 - A program is an optional `NAME` followed by one or more triggers.
