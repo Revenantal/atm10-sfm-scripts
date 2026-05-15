@@ -2,33 +2,31 @@ name "Mob Generation"
 
 -- ATM10 uses Hostile Neural Networks for Deep Mob Learning-style automation.
 -- Mob-specific predictions are all hostilenetworks:prediction with model data attached.
--- AE2 preserves exact prediction variants, so processing patterns can consume
--- a specific prediction, such as Zombie Prediction, for a configured output.
+-- Store prediction outputs in capped drawers outside AE2 to avoid channel usage
+-- and let drawer capacity backpressure Simulation Chambers.
 --
 -- SFM responsibilities:
 -- - Power all Hostile Neural Networks machines.
--- - Insert Prediction Matrix into Simulation Chamber slot 1.
+-- - Insert Prediction Matrix from AE-visible input into Simulation Chamber slot 1.
 -- - Extract generalized predictions from Simulation Chamber slot 2.
--- - Extract mob-specific predictions from Simulation Chamber slot 3 into
---   AE-visible prediction storage.
+-- - Extract prediction outputs into capped drawer storage.
+-- - Insert mob-specific predictions from capped drawer storage into Loot Fabricator slot 0.
 -- - Extract fabricated loot from Loot Fabricator slots 1-16.
 --
 -- AE2 responsibilities:
--- - Store exact mob prediction variants.
--- - Use processing patterns for each configured Loot Fabricator output, such as
---   1 Zombie Prediction -> 8 Iron Ingots.
+-- - Keep Prediction Matrix stocked in the AE-visible input inventory.
 -- - Use ME Requesters to keep final item stock targets, such as 10000 ingots.
--- - Use Pattern Providers to insert exact predictions into the specific Loot
---   Fabricator configured for that pattern's output.
 --
 -- Generic labels:
 -- - "Mob Generation Power" is the FE source.
 -- - "Mob Generation Power Demand" goes on all Simulation Chambers and Loot Fabricators.
--- - "Prediction Matrix Input" is the source inventory for Prediction Matrix items.
+-- - "Prediction Matrix Input" is an AE2 input inventory for Prediction Matrix items.
 -- - "Mob Generation Simulation Chamber" goes on all Simulation Chambers.
--- - "Mob Generation Loot Fabricator" goes on all Loot Fabricators SFM should drain.
--- - "Prediction Storage Input" is an AE2 import/interface/input inventory for mob predictions.
--- - "Drawer Controller" receives generalized predictions and fabricated loot.
+-- - "Mob Generation Loot Fabricator" goes on all Loot Fabricators for output draining.
+-- - Each production lane uses paired labels:
+--   "<Model> Prediction" goes on the locked drawer for that exact prediction variant.
+--   "<Model> Loot Fabricator" also goes on the matching Loot Fabricator for input stocking.
+-- - "Drawer Controller" receives predictions and fabricated loot, backed by locked drawers.
 
 every tick do
     input fe:: from each "Mob Generation Power"
@@ -39,7 +37,7 @@ end
 every 20 ticks do
     -- Prediction Matrix goes into Simulation Chamber slot 1.
     input hostilenetworks:prediction_matrix from "Prediction Matrix Input"
-    output retain 1 hostilenetworks:prediction_matrix to each "Mob Generation Simulation Chamber" slots 1
+    output retain 64 hostilenetworks:prediction_matrix to each "Mob Generation Simulation Chamber" slots 1
     forget
 
     -- Generalized prediction outputs are slot 2 and can be mixed safely.
@@ -52,13 +50,290 @@ every 20 ticks do
     output to "Drawer Controller"
     forget
 
-    -- Mob-specific prediction outputs are slot 3. Send them to AE2-visible
-    -- storage so AE2 can preserve exact prediction variants.
+    -- Mob-specific prediction outputs are slot 3. Send them to capped storage
+    -- outside AE2 so drawer capacity limits runaway prediction buildup.
     input hostilenetworks:prediction from each "Mob Generation Simulation Chamber" slots 3
-    output to "Prediction Storage Input"
+    output to "Drawer Controller"
     forget
 
-    -- Loot Fabricator slot 0 is filled by AE2 Pattern Providers.
+    -- SFML matches HNN predictions by item ID, not prediction variant data.
+    -- Each prediction label must be a locked drawer containing only that variant.
+    input hostilenetworks:prediction from "Piglich Prediction"
+    output retain 1 hostilenetworks:prediction to each "Piglich Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Wilden Mobs Prediction"
+    output retain 1 hostilenetworks:prediction to each "Wilden Mobs Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Mimic Prediction"
+    output retain 1 hostilenetworks:prediction to each "Mimic Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Bat Prediction"
+    output retain 1 hostilenetworks:prediction to each "Bat Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Blaze Prediction"
+    output retain 1 hostilenetworks:prediction to each "Blaze Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Redstone Ore Prediction"
+    output retain 1 hostilenetworks:prediction to each "Redstone Ore Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Breeze Prediction"
+    output retain 1 hostilenetworks:prediction to each "Breeze Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Chicken Prediction"
+    output retain 1 hostilenetworks:prediction to each "Chicken Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Cod Prediction"
+    output retain 1 hostilenetworks:prediction to each "Cod Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Cow Prediction"
+    output retain 1 hostilenetworks:prediction to each "Cow Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Creeper Prediction"
+    output retain 1 hostilenetworks:prediction to each "Creeper Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Drowned Prediction"
+    output retain 1 hostilenetworks:prediction to each "Drowned Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Elder Guardian Prediction"
+    output retain 1 hostilenetworks:prediction to each "Elder Guardian Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Ender Dragon Prediction"
+    output retain 1 hostilenetworks:prediction to each "Ender Dragon Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Enderman Prediction"
+    output retain 1 hostilenetworks:prediction to each "Enderman Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Evoker Prediction"
+    output retain 1 hostilenetworks:prediction to each "Evoker Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Ghast Prediction"
+    output retain 1 hostilenetworks:prediction to each "Ghast Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Glow Squid Prediction"
+    output retain 1 hostilenetworks:prediction to each "Glow Squid Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Guardian Prediction"
+    output retain 1 hostilenetworks:prediction to each "Guardian Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Hoglin Prediction"
+    output retain 1 hostilenetworks:prediction to each "Hoglin Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Iron Golem Prediction"
+    output retain 1 hostilenetworks:prediction to each "Iron Golem Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Magma Cube Prediction"
+    output retain 1 hostilenetworks:prediction to each "Magma Cube Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Mooshroom Prediction"
+    output retain 1 hostilenetworks:prediction to each "Mooshroom Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Phantom Prediction"
+    output retain 1 hostilenetworks:prediction to each "Phantom Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Pig Prediction"
+    output retain 1 hostilenetworks:prediction to each "Pig Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Polar Bear Prediction"
+    output retain 1 hostilenetworks:prediction to each "Polar Bear Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Rabbit Prediction"
+    output retain 1 hostilenetworks:prediction to each "Rabbit Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Sheep Prediction"
+    output retain 1 hostilenetworks:prediction to each "Sheep Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Shulker Prediction"
+    output retain 1 hostilenetworks:prediction to each "Shulker Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Skeleton Prediction"
+    output retain 1 hostilenetworks:prediction to each "Skeleton Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Slime Prediction"
+    output retain 1 hostilenetworks:prediction to each "Slime Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Snow Golem Prediction"
+    output retain 1 hostilenetworks:prediction to each "Snow Golem Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Spider Prediction"
+    output retain 1 hostilenetworks:prediction to each "Spider Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Squid Prediction"
+    output retain 1 hostilenetworks:prediction to each "Squid Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Basalz Prediction"
+    output retain 1 hostilenetworks:prediction to each "Basalz Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Blitz Prediction"
+    output retain 1 hostilenetworks:prediction to each "Blitz Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Blizz Prediction"
+    output retain 1 hostilenetworks:prediction to each "Blizz Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Alpha Yeti Prediction"
+    output retain 1 hostilenetworks:prediction to each "Alpha Yeti Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Carminite Golem Prediction"
+    output retain 1 hostilenetworks:prediction to each "Carminite Golem Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Death Tome Prediction"
+    output retain 1 hostilenetworks:prediction to each "Death Tome Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Deer Prediction"
+    output retain 1 hostilenetworks:prediction to each "Deer Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Fire Beetle Prediction"
+    output retain 1 hostilenetworks:prediction to each "Fire Beetle Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Giant Prediction"
+    output retain 1 hostilenetworks:prediction to each "Giant Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Goblin Prediction"
+    output retain 1 hostilenetworks:prediction to each "Goblin Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Helmet Crab Prediction"
+    output retain 1 hostilenetworks:prediction to each "Helmet Crab Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Hydra Prediction"
+    output retain 1 hostilenetworks:prediction to each "Hydra Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Kobold Prediction"
+    output retain 1 hostilenetworks:prediction to each "Kobold Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Lich Prediction"
+    output retain 1 hostilenetworks:prediction to each "Lich Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Minoshroom Prediction"
+    output retain 1 hostilenetworks:prediction to each "Minoshroom Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Minotaur Prediction"
+    output retain 1 hostilenetworks:prediction to each "Minotaur Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Naga Prediction"
+    output retain 1 hostilenetworks:prediction to each "Naga Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Raven Prediction"
+    output retain 1 hostilenetworks:prediction to each "Raven Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Redcap Prediction"
+    output retain 1 hostilenetworks:prediction to each "Redcap Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Skeleton Druid Prediction"
+    output retain 1 hostilenetworks:prediction to each "Skeleton Druid Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Snow Queen Prediction"
+    output retain 1 hostilenetworks:prediction to each "Snow Queen Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Stable Ice Core Prediction"
+    output retain 1 hostilenetworks:prediction to each "Stable Ice Core Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Towerwood Borer Prediction"
+    output retain 1 hostilenetworks:prediction to each "Towerwood Borer Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Troll Prediction"
+    output retain 1 hostilenetworks:prediction to each "Troll Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Ur Ghast Prediction"
+    output retain 1 hostilenetworks:prediction to each "Ur Ghast Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Winter Wolf Prediction"
+    output retain 1 hostilenetworks:prediction to each "Winter Wolf Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Wraith Prediction"
+    output retain 1 hostilenetworks:prediction to each "Wraith Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Yeti Prediction"
+    output retain 1 hostilenetworks:prediction to each "Yeti Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Vindicator Prediction"
+    output retain 1 hostilenetworks:prediction to each "Vindicator Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Warden Prediction"
+    output retain 1 hostilenetworks:prediction to each "Warden Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Witch Prediction"
+    output retain 1 hostilenetworks:prediction to each "Witch Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Wither Prediction"
+    output retain 1 hostilenetworks:prediction to each "Wither Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Wither Skeleton Prediction"
+    output retain 1 hostilenetworks:prediction to each "Wither Skeleton Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Zombie Prediction"
+    output retain 1 hostilenetworks:prediction to each "Zombie Loot Fabricator" slots 0
+    forget
+
+    input hostilenetworks:prediction from "Zombified Piglin Prediction"
+    output retain 1 hostilenetworks:prediction to each "Zombified Piglin Loot Fabricator" slots 0
+    forget
+
     -- Loot Fabricator slots 1-16 are fabricated loot outputs.
     input from each "Mob Generation Loot Fabricator" slots 1-16
     output to "Drawer Controller"
