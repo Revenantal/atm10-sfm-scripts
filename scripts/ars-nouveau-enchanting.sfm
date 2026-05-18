@@ -1,0 +1,30 @@
+name "Ars Nouveau Enchanting"
+
+-- Label the source barrel "Ars Nouveau Enchanting Input".
+-- Label all eight nearby Ars Nouveau pedestals "Ars Nouveau Enchanting Pedestal".
+-- Label the central Ars Nouveau enchanting apparatus "Enchanting Apparatus".
+-- Label the ME-facing output inventory "ME Storage".
+--
+-- ATM10 reference: Unobtainium-Allthemodium alloy uses eight pedestal
+-- ingredients and a Source Gem reagent in the apparatus. The block recipe
+-- uses a Source Gem Block reagent, so both source items are kept out of
+-- the pedestal distribution pass.
+
+every 20 ticks do
+    -- Pull completed crafts or accidental non-reagent items out of the apparatus.
+    input * except ars_nouveau:source_gem, ars_nouveau:source_gem_block from "Enchanting Apparatus"
+    output to "ME Storage"
+    forget
+
+    input
+        ars_nouveau:source_gem,
+        ars_nouveau:source_gem_block,
+    from "Ars Nouveau Enchanting Input"
+    output 1 to "Enchanting Apparatus"
+    forget
+
+    -- Distribute all non-source items evenly across the pedestal group.
+    input * except ars_nouveau:source_gem, ars_nouveau:source_gem_block from "Ars Nouveau Enchanting Input"
+    output 1 to each "Ars Nouveau Enchanting Pedestal"
+    forget
+end
