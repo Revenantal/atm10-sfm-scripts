@@ -1,0 +1,83 @@
+name "Bee Breeding"
+
+-- Labels:
+-- - "Power Source" is the FE source.
+-- - "ME Interface" supplies bee cages, poppies, and honey treats.
+-- - "Bee Breeding Chamber" goes on all Productive Bees breeding chambers.
+-- - "BaBee Incubator" goes on all Productive Bees BaBee incubators.
+-- - "Bottler" goes on all Productive Bees bottlers.
+-- - "Squished Bee Material" stores bottler output before centrifuging.
+-- - "Powered Centrifuge" goes on all Productive Bees powered centrifuges.
+-- - "Gene Indexer" stores and combines Productive Bees gene samples.
+-- - "Trash" receives bee stingers from the squished bee material buffer.
+-- - "Baby Bee Chest" stores breeding chamber outputs before incubation.
+-- - "Grown Bee Chest" stores grown bees after incubation and feeds the dispenser when gated.
+-- - "Dispenser" receives grown bee items while this manager has redstone signal.
+
+every tick do
+    input fe:: from each "Power Source"
+    output fe:: to each "Bee Breeding Chamber"
+    output fe:: to each "BaBee Incubator"
+    output fe:: to each "Powered Centrifuge"
+    forget
+end
+
+every 20 ticks do
+    -- Breeding chamber slot 0 accepts caged bees.
+    input productivebees:bee_cage from "ME Interface"
+    output retain 64 productivebees:bee_cage to each "Bee Breeding Chamber" slots 0
+
+    -- Breeding chamber slots 3 and 4 are the flower inputs.
+    input 128 minecraft:poppy from "ME Interface"
+    output retain 64 minecraft:poppy to each "Bee Breeding Chamber" slots 3
+    output retain 64 minecraft:poppy to each "Bee Breeding Chamber" slots 4
+
+    -- BaBee Incubator slot 1 accepts honey treats.
+    input productivebees:honey_treat from "ME Interface"
+    output retain 64 productivebees:honey_treat to each "BaBee Incubator" slots 1
+
+    -- Bottler slot 0 accepts glass bottles.
+    input minecraft:glass_bottle from "ME Interface"
+    output retain 64 minecraft:glass_bottle to each "Bottler" slots 0
+    -- Clear ME-supplied inputs before broad output handling below.
+    forget
+
+    -- Breeding chamber slot 5 is the baby bee output.
+    input from each "Bee Breeding Chamber" slots 5
+    output to "Baby Bee Chest"
+    forget
+
+    -- BaBee Incubator slot 0 accepts baby bees.
+    input from "Baby Bee Chest"
+    output to each "BaBee Incubator" slots 0
+    forget
+
+    -- BaBee Incubator slot 2 is the grown bee output.
+    input from each "BaBee Incubator" slots 2
+    output to "Grown Bee Chest"
+    forget
+
+    -- Bottler slot 11 is the squashed bee material output.
+    input from each "Bottler" slots 11
+    output to "Squished Bee Material"
+    forget
+
+    input the_bumblezone:bee_stinger from "Squished Bee Material"
+    output to "Trash"
+    forget
+
+    input productivebees:gene_bottle from "Squished Bee Material"
+    output to each "Powered Centrifuge"
+    forget
+
+    -- Powered centrifuge slots 2-10 are gene output slots.
+    input from each "Powered Centrifuge" slots 2-10
+    output to "Gene Indexer"
+    forget
+
+    if redstone >= 1 then
+        input from "Grown Bee Chest"
+        output to "Dispenser"
+        forget
+    end
+end
